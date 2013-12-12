@@ -401,8 +401,41 @@ __END__
 
 =head1 SYNOPSIS
 
-    ...
+    # app.psgi
+    use Plack::App::Directory::Apaxy;
+    my $app = Plack::App::Directory->new({ root => "/path/to/htdocs" })->to_app;
+
+    # one-liner
+    $ plackup -MPlack::App::Directory::Apaxy -e 'Plack::App::Directory::Apaxy->new->to_app'
+
+    # one-liner using Starlet
+    $ plackup -s Starlet -MPlack::App::Directory::Apaxy --max-workers=5 -e 'Plack::App::Directory::Apaxy->new->to_app'
+
 
 =head1 DESCRIPTION
 
-...
+This is a static file server PSGI application with directory index using Apaxy.
+
+
+=attr root
+
+Document root directory. Defaults to the current directory.
+
+=attr apaxy_root
+
+Apaxy resource root directory. Usually you don't need to set it up by your hand.
+
+=attr below
+
+HTML contents what you want to insert to index page.
+
+=attr footer
+
+HTML contents what you want to insert to index page.
+
+
+=head1 SEE ALSO
+
+=for :list
+* L<Plack::App::Directory>
+* L<Apaxy|http://adamwhitcroft.com/apaxy/>
