@@ -15,7 +15,7 @@ use Path::Tiny;
 use Time::Piece;
 use URI::Escape;
 
-use Plack::Util::Accessor qw( apaxy_docroot below footer );
+use Plack::Util::Accessor qw( apaxy_root below footer );
 
 our %MIME_TYPE_TO_ALT = (
     "application/atom+xml"                            => q{rss},
@@ -177,8 +177,8 @@ sub prepare_app {
 &amp; <a href="http://www.perl.org/">Perl</a>.
 END_TEXT
 
-    unless ( $self->apaxy_docroot ) {
-        $self->apaxy_docroot(
+    unless ( $self->apaxy_root ) {
+        $self->apaxy_root(
             File::Spec::Unix->catdir(
                 File::Basename::dirname(__FILE__),
                 'Apaxy',
@@ -217,7 +217,7 @@ sub locate_apaxy {
     return if     $path =~ m{\0};
     return unless $path =~ m{^/_apaxy/};
 
-    my $docroot = $self->apaxy_docroot;
+    my $docroot = $self->apaxy_root;
     my @path = split /[\\\/]/, $path;
     if (@path) {
         shift @path if $path[0] eq q{};
@@ -243,7 +243,7 @@ sub serve_path {
     my ( $self, $env, $dir ) = @_;
 
     if ( $dir =~ m{^/_apaxy/} ) {
-        my $docroot = $self->apaxy_docroot;
+        my $docroot = $self->apaxy_root;
         my $file    = File::Spec::Unix->catfile( $docroot, $dir );
         return $self->SUPER::serve_path( $env, $file ) if -f $file;
     }
