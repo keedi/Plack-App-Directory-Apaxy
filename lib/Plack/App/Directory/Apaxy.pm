@@ -8,7 +8,6 @@ use warnings;
 use Plack::MIME;
 use Plack::Util;
 
-use File::Spec::Unix;
 use Number::Bytes::Human;
 use Path::Tiny;
 use Time::Piece;
@@ -177,13 +176,7 @@ sub prepare_app {
 END_TEXT
 
     unless ( $self->apaxy_root ) {
-        $self->apaxy_root(
-            File::Spec::Unix->catdir(
-                path(__FILE__)->dirname,
-                'Apaxy',
-                'public',
-            )
-        );
+        $self->apaxy_root( path(__FILE__)->parent->child(qw/ Apaxy public /) );
     }
 }
 
@@ -226,7 +219,7 @@ sub locate_apaxy {
     }
     return if grep $_ eq q{..}, @path;
 
-    my $file = File::Spec::Unix->catfile( $docroot, @path );
+    my $file = path( $docroot, @path );
     return unless $self->should_handle($file);
     return unless -r $file;
 
@@ -243,7 +236,7 @@ sub serve_path {
 
     if ( $dir =~ m{^/_apaxy/} ) {
         my $docroot = $self->apaxy_root;
-        my $file    = File::Spec::Unix->catfile( $docroot, $dir );
+        my $file    = path( $docroot, $dir );
         return $self->SUPER::serve_path( $env, $file ) if -f $file;
     }
 
