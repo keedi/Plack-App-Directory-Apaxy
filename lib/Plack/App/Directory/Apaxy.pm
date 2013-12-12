@@ -8,7 +8,6 @@ use warnings;
 use Plack::MIME;
 use Plack::Util;
 
-use File::Basename;
 use File::Spec::Unix;
 use Number::Bytes::Human;
 use Path::Tiny;
@@ -180,7 +179,7 @@ END_TEXT
     unless ( $self->apaxy_root ) {
         $self->apaxy_root(
             File::Spec::Unix->catdir(
-                File::Basename::dirname(__FILE__),
+                path(__FILE__)->dirname,
                 'Apaxy',
                 'public',
             )
