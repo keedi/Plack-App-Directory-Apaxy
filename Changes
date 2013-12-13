@@ -1,5 +1,8 @@
 Release history for Plack-App-Directory-Apaxy
 
+    - set lower priority for `_apaxy/*` and `favicon.ico` than root path
+    - add favicon.ico
+
 0.002   2013-12-13 07:09:24 Asia/Seoul
     - update module dependency
 
