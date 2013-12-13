@@ -99,9 +99,10 @@ my %test = (
             /_apaxy/icons/xml.png
             /_apaxy/icons/zip.png
             /_apaxy/style.css
+            /favicon.ico
         }) {
             $res = $cb->(GET $url);
-            is $res->code, 200;
+            is $res->code, 200, $url;
         }
 
     SKIP: {
