@@ -207,7 +207,7 @@ sub locate_apaxy {
 
     my $path = $env->{PATH_INFO} || q{};
     return if     $path =~ m{\0};
-    return unless $path =~ m{^/_apaxy/};
+    return unless $path =~ m{^(/_apaxy/|/favicon.ico/$)};
 
     my $docroot = $self->apaxy_root;
     my @path = split /[\\\/]/, $path;
@@ -234,7 +234,7 @@ sub get_mime_type_icon {
 sub serve_path {
     my ( $self, $env, $dir ) = @_;
 
-    if ( $dir =~ m{^/_apaxy/} ) {
+    if ( $dir =~ m{^(/_apaxy/|/favicon.ico$)} ) {
         my $docroot = $self->apaxy_root;
         my $file    = path( $docroot, $dir );
         return $self->SUPER::serve_path( $env, $file ) if -f $file;
