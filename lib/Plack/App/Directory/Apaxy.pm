@@ -238,12 +238,12 @@ sub locate_apaxy {
 sub serve_path {
     my ( $self, $env, $dir ) = @_;
 
-    return $self->SUPER::serve_path( $env, $dir ) if -e $dir;
+    return $self->SUPER::serve_path( $env, $dir ) if -f $dir;
 
     if ( $dir =~ m{^(/_apaxy/|/favicon.ico$)} ) {
         my $docroot = $self->apaxy_root;
         my $file    = path( $docroot, $dir );
-        return $self->SUPER::serve_path( $env, $file ) if -e $file;
+        return $self->SUPER::serve_path( $env, $file ) if -f $file;
     }
 
     my $dir_url = $env->{SCRIPT_NAME} . $env->{PATH_INFO};
