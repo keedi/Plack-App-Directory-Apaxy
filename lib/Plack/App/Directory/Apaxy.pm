@@ -185,8 +185,16 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    my ( $file, $path_info ) = $self->file || $self->locate_apaxy($env) || $self->locate_file($env);
-    return $file if ref $file eq 'ARRAY';
+    my ( $file, $path_info ) = $self->file;
+    if ( !$file ) {
+        ( $file, $path_info ) = $self->locate_file($env);
+        if ( ref $file eq 'ARRAY' ) {
+            return $file unless $file->[0] == 404;
+
+            ( $file, $path_info ) = $self->locate_apaxy($env);
+            return $file if ref $file eq 'ARRAY';
+        }
+    }
 
     if ($path_info) {
         $env->{'plack.file.SCRIPT_NAME'} = $env->{SCRIPT_NAME} . $env->{PATH_INFO};
@@ -206,8 +214,8 @@ sub locate_apaxy {
     my ( $self, $env ) = @_;
 
     my $path = $env->{PATH_INFO} || q{};
-    return if     $path =~ m{\0};
-    return unless $path =~ m{^(/_apaxy/|/favicon.ico/$)};
+    return $self->return_400 if     $path =~ m{\0};
+    return $self->return_404 unless $path =~ m{^(/_apaxy/|/favicon.ico$)};
 
     my $docroot = $self->apaxy_root;
     my @path = split /[\\\/]/, $path;
@@ -217,11 +225,11 @@ sub locate_apaxy {
     else {
         @path = (q{.});
     }
-    return if grep $_ eq q{..}, @path;
+    return $self->return_403 if grep $_ eq q{..}, @path;
 
     my $file = path( $docroot, @path );
-    return unless $self->should_handle($file);
-    return unless -r $file;
+    return $self->return_404 unless $self->should_handle($file);
+    return $self->return_403 unless -r $file;
 
     return $file, join( q{/}, q{}, @path );
 }
@@ -230,13 +238,13 @@ sub locate_apaxy {
 sub serve_path {
     my ( $self, $env, $dir ) = @_;
 
+    return $self->SUPER::serve_path( $env, $dir ) if -e $dir;
+
     if ( $dir =~ m{^(/_apaxy/|/favicon.ico$)} ) {
         my $docroot = $self->apaxy_root;
         my $file    = path( $docroot, $dir );
-        return $self->SUPER::serve_path( $env, $file ) if -f $file;
+        return $self->SUPER::serve_path( $env, $file ) if -e $file;
     }
-
-    return $self->SUPER::serve_path( $env, $dir ) if -f $dir;
 
     my $dir_url = $env->{SCRIPT_NAME} . $env->{PATH_INFO};
     return $self->return_dir_redirect($env) if $dir_url !~ m{/$};
