@@ -4,7 +4,7 @@ Plack::App::Directory::Apaxy - Serve static files from document root with direct
 
 # VERSION
 
-version 0.003
+version 0.004
 
 # SYNOPSIS
 
