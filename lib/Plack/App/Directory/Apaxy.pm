@@ -226,10 +226,6 @@ sub locate_apaxy {
     return $file, join( q{/}, q{}, @path );
 }
 
-sub get_mime_type_icon {
-    my $self = shift;
-}
-
 # Stolen from Plack::App::Directory (Plack version 1.0030)
 sub serve_path {
     my ( $self, $env, $dir ) = @_;
