@@ -1,5 +1,6 @@
 Release history for Plack-App-Directory-Apaxy
 
+0.004   2013-12-13 18:35:14 Asia/Seoul
     - fix mis-called parent serve_path() method
 
 0.003   2013-12-13 18:14:34 Asia/Seoul
