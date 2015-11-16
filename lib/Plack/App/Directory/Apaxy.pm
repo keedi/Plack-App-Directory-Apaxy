@@ -126,6 +126,7 @@ my $dir_file = q{<tr> <td valign="top"><img src="/_apaxy/icons/%s.png" alt="[%s]
 
 sub _get_dir_page_fmt {
     my $self = shift;
+	my %params = %{ shift() };
 
     my $dir_page = <<"END_PAGE";
 <!DOCTYPE html>
@@ -142,9 +143,9 @@ sub _get_dir_page_fmt {
         <table>
           <tr>
             <th><img src="/_apaxy/icons/blank.png" alt="[ICO]" /></th>
-            <th><a href="?C=N;O=D">Name</a></th>
-            <th><a href="?C=M;O=A">Last modified</a></th>
-            <th><a href="?C=S;O=A">Size</a></th>
+            <th><a href="?$params{STR}{N}">Name</a></th>
+            <th><a href="?$params{STR}{M}">Last modified</a></th>
+            <th><a href="?$params{STR}{S}">Size</a></th>
           </tr>
 %s
         </table>
@@ -266,6 +267,19 @@ sub serve_path {
     my $order     = $req->param('O') || q{A};
     my $dir_first = $req->param('D') || q{Y};
     my $hide      = $req->param('H') || q{Y};
+    $dir_first    = $dir_first eq 'N' ? 'N' : 'Y';
+    $hide         = $hide eq 'N' ? 'N' : 'Y';
+    my %params = ( D => $dir_first, H => $hide );
+    for my $cat ( qw/S M N/ ) {
+        if ($category eq $cat) {
+            $params{C}{ $cat } = $order eq 'A' ? 'D' : 'A';
+        }
+        $params{C}{ $cat } ||= 'A';
+        $params{STR}{ $cat }   = "C=$cat;O=$params{C}{$cat};";
+        $params{STR}{ $cat } .=
+            join(';',map("$_=$params{$_}", qw/D H/));
+    }
+
 
     my @children;
     if ( $hide eq 'Y' ) {
@@ -386,7 +400,7 @@ sub serve_path {
         my $f = $_;
         sprintf q{   } x 8 . $dir_file, map Plack::Util::encode_html($_), @$f;
     } @files;
-    my $page  = sprintf $self->_get_dir_page_fmt, $path, $path, $files;
+    my $page  = sprintf $self->_get_dir_page_fmt( \%params ), $path, $path, $files;
 
     return [ 200, [ 'Content-Type' => 'text/html; charset=utf-8' ], [$page] ];
 }
